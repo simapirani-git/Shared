@@ -1,102 +1,130 @@
 # Shared - Reusable .NET Class Library
 
-A reusable .NET class library packaged as a NuGet package and distributed through Azure Artifacts.
+## Introduction
 
-This project demonstrates how to develop, build, package, publish, and consume a shared library across multiple independent .NET projects using Azure DevOps Pipelines and Azure Artifacts.
+Shared is a reusable .NET class library designed to provide centralized shared components for multiple independent .NET applications.
 
-## Project Overview
+This project demonstrates how to develop, build, test, package, and distribute a reusable library as a NuGet package using Azure DevOps Artifacts.
 
-The main objective is to create a centralized reusable library that can be consumed by multiple applications without duplicating code.
+The package is consumed by independent application repositories, helping reduce code duplication and simplify dependency management.
 
-### Key Features
+## Project Architecture
 
-- Reusable .NET Class Library
-- NuGet package generation
-- Automated build and packaging
-- Package publishing to Azure Artifacts
-- Package consumption across independent projects
-- CI/CD automation using Azure DevOps Pipelines
+This project is part of a Multi-Repository architecture consisting of four independent repositories:
 
-## Technology Stack
+| Repository | Description |
+|---|---|
+| Shared | Reusable .NET class library distributed as a NuGet package |
+| Basket | ASP.NET Core Web API |
+| Identity | ASP.NET Core Web API |
+| Order | ASP.NET Core Web API |
+
+Each repository maintains its own solution, project structure, source code, and Git history.
+
+## Technologies Used
 
 - C#
 - .NET 10
-- Visual Studio 2026
-- NuGet
-- Azure DevOps Server
-- Azure Artifacts
-- Git
+- .NET Class Library
+- MSTest
+- NuGet Package Management
+- Azure DevOps Artifacts
+- Azure DevOps Classic Pipelines
+- Git and GitHub
 
-## Project Structure
+## Repository Structure
 
 ```text
 Shared/
 │
 ├── src/
-│   └── Shared/
-│       ├── Class1.cs
-│       └── Shared.csproj
+│   ├── Shared/
+│   │   ├── Shared.csproj
+│   │   └── Class1.cs
+│   │
+│   └── Shared.Tests/
+│       ├── Shared.Tests.csproj
+│       ├── MSTestSettings.cs
+│       └── Test1.cs
 │
-├── Shared.slnx
 ├── .gitignore
-└── README.md
+├── NuGet.Config
+├── README.md
+└── Shared.slnx
 ```
 
-## Workflow
+## Build and Test
 
-1. Develop reusable functionality in the Shared library.
-2. Build the project using .NET CLI.
-3. Generate a NuGet package.
-4. Publish the package to Azure Artifacts.
-5. Configure other independent projects to access the package feed.
-6. Install and use the Shared package through NuGet.
-
-## Build the Project
+Restore dependencies:
 
 ```bash
-dotnet restore
-dotnet build
+dotnet restore Shared.slnx
 ```
 
-## Create a NuGet Package
+Build the solution:
 
 ```bash
-dotnet pack -c Release
+dotnet build Shared.slnx --no-restore
 ```
 
-The generated `.nupkg` file will be available in the build output directory.
+Run unit tests:
 
-## Package Consumption
+```bash
+dotnet test Shared.slnx --no-build
+```
 
-Other .NET projects can consume this library by adding a PackageReference to their project file:
+Create a NuGet package:
+
+```bash
+dotnet pack Shared.slnx -c Release
+```
+
+## NuGet Package Distribution
+
+The Shared library is packaged and published to Azure DevOps Artifacts.
+
+**Package information:**
+
+- Package name: `Shared`
+- Package type: NuGet
+- Azure Artifacts feed: `Shared-Feed`
+- Example package version: `1.0.0`
+
+Other repositories consume the package through a PackageReference:
 
 ```xml
-<ItemGroup>
-    <PackageReference Include="Shared" Version="1.0.0" />
-</ItemGroup>
+<PackageReference Include="Shared" Version="1.0.0" />
 ```
 
-The package version should match the version published to the NuGet feed.
+Feed authentication and package source configuration are managed separately through NuGet configuration and Azure DevOps service connections.
 
-## CI/CD
+## CI/CD Pipeline
 
-Azure DevOps Pipelines are used to automate the following stages:
+The project uses an Azure DevOps Classic Pipeline to automate the package lifecycle.
 
-- Restore dependencies
-- Build the library
-- Package the library
-- Publish the NuGet package to Azure Artifacts
+Pipeline workflow:
+
+1. NuGet Restore
+2. Build
+3. Test
+4. Pack
+5. Push NuGet Package
+6. Publish Build Artifact
+
+This process helps ensure that the shared library is built, tested, and packaged before distribution.
 
 ## Learning Objectives
 
 This project demonstrates practical experience with:
 
-- Multi-project development
-- NuGet package management
-- Azure Artifacts
-- CI/CD pipeline implementation
+- Multi-repository development
 - Reusable software components
+- NuGet package creation and distribution
+- Azure DevOps Artifacts
+- Classic CI/CD pipeline implementation
+- Unit testing with MSTest
 - Dependency management across independent repositories
+- Git version control and GitHub repository management
 
 ---
 
